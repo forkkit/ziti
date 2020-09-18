@@ -28,10 +28,14 @@ import (
 var createServiceClient *mgmtClient
 var createServiceTerminatorStrategy string
 var createServiceName string
+var createServiceIdentityAddressingAllowed bool
+var createServiceIdentityAddressingRequired bool
 
 func init() {
 	createService.Flags().StringVar(&createServiceName, "name", "", "Service name. If not provided defaults to the ID")
 	createService.Flags().StringVar(&createServiceTerminatorStrategy, "terminator-strategy", "", "Terminator strategy for service")
+	createService.Flags().BoolVar(&createServiceIdentityAddressingAllowed, "identity-addressing-allowed", false, "Allow service to be dialed for a specific identity")
+	createService.Flags().BoolVar(&createServiceIdentityAddressingRequired, "identity-addressing-required", false, "Required service to be dialed for a specific identity")
 	createServiceClient = NewMgmtClient(createService)
 	createCmd.AddCommand(createService)
 }
@@ -44,9 +48,11 @@ var createService = &cobra.Command{
 		if ch, err := createServiceClient.Connect(); err == nil {
 			request := &mgmt_pb.CreateServiceRequest{
 				Service: &mgmt_pb.Service{
-					Id:                 args[0],
-					Name:               createServiceName,
-					TerminatorStrategy: createServiceTerminatorStrategy,
+					Id:                         args[0],
+					Name:                       createServiceName,
+					TerminatorStrategy:         createServiceTerminatorStrategy,
+					IdentityAddressingAllowed:  createServiceIdentityAddressingAllowed,
+					IdentityAddressingRequired: createServiceIdentityAddressingRequired,
 				},
 			}
 			body, err := proto.Marshal(request)

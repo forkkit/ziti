@@ -52,10 +52,10 @@ var getService = &cobra.Command{
 				response := &mgmt_pb.GetServiceResponse{}
 				err := proto.Unmarshal(responseMsg.Body, response)
 				if err == nil {
-					fmt.Printf("\n%10s | %30s | %30s\n", "Id", "Name", "Terminator Strategy")
+					fmt.Printf("\n%10s | %20s | %20s | %25s \n", "Id", "Name", "Terminator Strategy", "Identity Addressing Allowed/Required")
 					fmt.Printf("-----------+--------------------------------+------------------------------\n")
 					svc := response.Service
-					fmt.Printf("%10s | %30s | %30s\n\n", svc.Id, svc.Name, svc.TerminatorStrategy)
+					fmt.Printf("%10s | %20s | %20s | %20v/%v\n\n", svc.Id, svc.Name, svc.TerminatorStrategy, svc.IdentityAddressingAllowed, svc.IdentityAddressingRequired)
 					fmt.Printf("Terminators (%v)\n", len(svc.Terminators))
 					fmt.Printf("\n%10s | %-12s| %v\n", "Id", "Binding", "Destination")
 					for _, terminator := range svc.Terminators {

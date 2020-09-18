@@ -56,17 +56,19 @@ var listServices = &cobra.Command{
 				response := &mgmt_pb.ListServicesResponse{}
 				if err := proto.Unmarshal(responseMsg.Body, response); err == nil {
 					out := fmt.Sprintf("\nServices: (%d)\n\n", len(response.Services))
-					out += fmt.Sprintf("%-12s | %-12s | %-12s | %s\n", "Id", "Name", "Terminator Strategy", "Destination(s)")
+					out += fmt.Sprintf("%-12s | %-12s | %-20s | %-30s | %s\n", "Id", "Name", "Terminator Strategy", "Identity Addressing Allowed/Required", "Destination(s)")
 					for _, svc := range response.Services {
 						if len(svc.Terminators) > 0 {
-							out += fmt.Sprintf("%-12s | %-12s | %-12s | %s\n", svc.Id, svc.Name, svc.TerminatorStrategy,
+							out += fmt.Sprintf("%-12s | %-12s | %-20s | %29v,%6v | %s\n", svc.Id, svc.Name, svc.TerminatorStrategy,
+								svc.IdentityAddressingAllowed, svc.IdentityAddressingRequired,
 								fmt.Sprintf("%-12s -> %s", svc.Terminators[0].RouterId, svc.Terminators[0].Address))
 							for _, terminator := range svc.Terminators[1:] {
-								out += fmt.Sprintf("%-12s | %-12s | %s\n", "", "",
+								out += fmt.Sprintf("%-12s   %-12s   %20s   %-36s | %s\n", "", "", "", "",
 									fmt.Sprintf("%-12s -> %s", terminator.RouterId, terminator.Address))
 							}
 						} else {
-							out += fmt.Sprintf("%-12s | %-12s | %-12s \n", svc.Id, svc.Name, svc.TerminatorStrategy)
+							out += fmt.Sprintf("%-12s | %-12s | %-20s | %29v,%6v |\n", svc.Id, svc.Name, svc.TerminatorStrategy,
+								svc.IdentityAddressingAllowed, svc.IdentityAddressingAllowed)
 						}
 					}
 					out += "\n"

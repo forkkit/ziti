@@ -28,12 +28,14 @@ import (
 
 type createServiceOptions struct {
 	commonOptions
-	terminatorStrategy string
-	tags               map[string]string
-	roleAttributes     []string
-	configs            []string
-	requireEncryption  bool
-	optionalEncryption bool
+	terminatorStrategy         string
+	identityAddressingAllowed  bool
+	identityAddressingRequired bool
+	tags                       map[string]string
+	roleAttributes             []string
+	configs                    []string
+	requireEncryption          bool
+	optionalEncryption         bool
 }
 
 // newCreateServiceCmd creates the 'edge controller create service local' command for the given entity type
@@ -70,6 +72,9 @@ func newCreateServiceCmd(f cmdutil.Factory, out io.Writer, errOut io.Writer) *co
 	cmd.Flags().StringSliceVarP(&options.configs, "configs", "c", nil, "Configuration id or names to be associated with the new service")
 	cmd.Flags().StringVar(&options.terminatorStrategy, "terminator-strategy", "", "Specifies the terminator strategy for the service")
 	cmd.Flags().BoolVarP(&options.optionalEncryption, "encryption-optional", "o", false, "Sets end-to-end encryption for the service to be optional, defaults to required")
+	cmd.Flags().BoolVar(&options.identityAddressingAllowed, "identity-addressing-allowed", false, "Allow service to be dialed for a specific identity")
+	cmd.Flags().BoolVar(&options.identityAddressingRequired, "identity-addressing-required", false, "Required service to be dialed for a specific identity")
+
 	options.AddCommonFlags(cmd)
 
 	return cmd
@@ -88,7 +93,8 @@ func runCreateService(o *createServiceOptions) (err error) {
 	if o.terminatorStrategy != "" {
 		setJSONValue(entityData, o.terminatorStrategy, "terminatorStrategy")
 	}
-
+	setJSONValue(entityData, o.identityAddressingAllowed, "identityAddressingAllowed")
+	setJSONValue(entityData, o.identityAddressingRequired, "identityAddressingRequired")
 	setJSONValue(entityData, !o.optionalEncryption, "encryptionRequired")
 
 	setJSONValue(entityData, o.roleAttributes, "roleAttributes")
